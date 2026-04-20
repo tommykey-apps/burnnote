@@ -9,6 +9,12 @@ data "archive_file" "placeholder" {
   }
 }
 
+# Stable APP_KEY generated and kept in tfstate (encrypted S3 backend)
+resource "random_password" "app_key" {
+  length  = 32
+  special = false
+}
+
 resource "aws_lambda_function" "api" {
   function_name = "${var.project}-api"
   role          = aws_iam_role.lambda.arn
@@ -18,7 +24,7 @@ resource "aws_lambda_function" "api" {
   timeout       = 28
   memory_size   = 512
 
-  layers = [var.bref_fpm_layer_arn]
+  layers = [var.bref_layer_arn]
 
   filename         = data.archive_file.placeholder.output_path
   source_code_hash = data.archive_file.placeholder.output_base64sha256
@@ -29,11 +35,12 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
+      BREF_RUNTIME                  = "fpm"
       APP_NAME                      = var.project
       APP_ENV                       = "production"
       APP_DEBUG                     = "false"
       APP_URL                       = "https://${var.domain}"
-      APP_KEY                       = "base64:placeholder-set-by-deploy"
+      APP_KEY                       = "base64:${base64encode(random_password.app_key.result)}"
       LOG_CHANNEL                   = "stderr"
       LOG_LEVEL                     = "warning"
       DB_CONNECTION                 = "null"
@@ -43,7 +50,6 @@ resource "aws_lambda_function" "api" {
       BROADCAST_CONNECTION          = "log"
       FILESYSTEM_DISK               = "local"
       DYNAMODB_TABLE                = aws_dynamodb_table.notes.name
-      AWS_REGION_APP                = var.region
       BURNNOTE_MAX_CIPHERTEXT_BYTES = "16384"
       BURNNOTE_MAX_EXPIRES_SEC      = "604800"
     }

@@ -89,25 +89,18 @@ jobs:
           find vendor/aws/aws-sdk-php -type d \( -name 'tests' -o -name 'docs' -o -name 'examples' \) -prune -exec rm -rf {} + || true
           zip -qr ../lambda.zip . -x '*.git*' 'tests/*' '.env' '.env.*' 'phpunit.xml' '.phpunit.cache/*' 'storage/logs/*'
 
+      - name: Wait for any pending update
+        run: aws lambda wait function-updated --function-name ${{ env.LAMBDA_FUNCTION }}
+
       - name: Deploy Lambda code
         run: |
           aws lambda update-function-code \
             --function-name ${{ env.LAMBDA_FUNCTION }} \
             --zip-file fileb://lambda.zip \
-            --no-cli-pager
+            --output json > /dev/null
 
-      - name: Set Lambda APP_KEY (only if placeholder)
-        run: |
-          CURRENT=$(aws lambda get-function-configuration \
-            --function-name ${{ env.LAMBDA_FUNCTION }} \
-            --query 'Environment.Variables.APP_KEY' --output text)
-          if [[ "$CURRENT" == *placeholder* ]]; then
-            NEW_KEY="base64:$(openssl rand -base64 32)"
-            aws lambda update-function-configuration \
-              --function-name ${{ env.LAMBDA_FUNCTION }} \
-              --environment "Variables={APP_KEY=$NEW_KEY}" \
-              --no-cli-pager
-          fi
+      - name: Wait for code update to finish
+        run: aws lambda wait function-updated --function-name ${{ env.LAMBDA_FUNCTION }}
 
   deploy-web:
     needs: detect-changes

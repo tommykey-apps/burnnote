@@ -9,43 +9,56 @@ const STORAGE_KEY = 'burnnote-locale';
 
 type MessageNode = string | { [k: string]: MessageNode };
 
-let locale = $state<Locale>('en');
+class LocaleState {
+	current = $state<Locale>('en');
 
+	set(next: Locale): void {
+		this.current = next;
+		if (typeof window !== 'undefined') {
+			try {
+				localStorage.setItem(STORAGE_KEY, next);
+			} catch {
+				// ignore storage errors
+			}
+			document.documentElement.lang = next;
+		}
+	}
+
+	init(): void {
+		if (typeof window === 'undefined') return;
+		let stored: string | null = null;
+		try {
+			stored = localStorage.getItem(STORAGE_KEY);
+		} catch {
+			// ignore
+		}
+		if (stored === 'en' || stored === 'ja') {
+			this.set(stored);
+			return;
+		}
+		const nav = navigator.language?.toLowerCase() ?? '';
+		this.set(nav.startsWith('ja') ? 'ja' : 'en');
+	}
+}
+
+export const localeState = new LocaleState();
+
+// Convenience wrappers (for imports that don't want the instance)
 export function getLocale(): Locale {
-	return locale;
+	return localeState.current;
 }
 
 export function setLocale(next: Locale): void {
-	locale = next;
-	if (typeof window !== 'undefined') {
-		try {
-			localStorage.setItem(STORAGE_KEY, next);
-		} catch {
-			// ignore storage errors
-		}
-		document.documentElement.lang = next;
-	}
+	localeState.set(next);
 }
 
 export function initLocale(): void {
-	if (typeof window === 'undefined') return;
-	let stored: string | null = null;
-	try {
-		stored = localStorage.getItem(STORAGE_KEY);
-	} catch {
-		// ignore
-	}
-	if (stored === 'en' || stored === 'ja') {
-		setLocale(stored);
-		return;
-	}
-	const nav = navigator.language?.toLowerCase() ?? '';
-	setLocale(nav.startsWith('ja') ? 'ja' : 'en');
+	localeState.init();
 }
 
 export function t(key: string, params?: Record<string, string | number>): string {
 	const parts = key.split('.');
-	let node: MessageNode = messages[locale];
+	let node: MessageNode = messages[localeState.current];
 	for (const p of parts) {
 		if (typeof node === 'string') return key;
 		node = node[p];

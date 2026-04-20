@@ -29,3 +29,7 @@ output "frontend_bucket_name" {
 output "public_url" {
   value = "https://${var.domain}"
 }
+
+output "dashboard_url" {
+  value = "https://${var.region}.console.aws.amazon.com/cloudwatch/home?region=${var.region}#dashboards:name=${aws_cloudwatch_dashboard.main.dashboard_name}"
+}

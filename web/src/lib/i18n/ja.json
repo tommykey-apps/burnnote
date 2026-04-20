@@ -1,0 +1,48 @@
+{
+	"meta": {
+		"title": "burnnote — 一度だけ読めるシークレット共有",
+		"description": "1 回読まれたら消えるシークレットを共有できます。"
+	},
+	"nav": {
+		"tagline": "一度だけ読めるシークレット"
+	},
+	"footer": {
+		"note": "暗号化はブラウザ内で完結。サーバーは鍵を知りません。"
+	},
+	"create": {
+		"heading": "一度だけ読めるシークレットを共有",
+		"description": "シークレットはブラウザ内で暗号化され、サーバーは暗号文のみを保持します。共有 URL は 1 回開かれた時点で消えます。",
+		"label_secret": "シークレット",
+		"placeholder": "共有したい内容を入力または貼り付け…",
+		"label_expires": "有効期限",
+		"expiry": {
+			"5m": "5 分",
+			"1h": "1 時間",
+			"1d": "1 日",
+			"7d": "7 日"
+		},
+		"submit": "一度だけ開ける URL を作成",
+		"submitting": "暗号化中…",
+		"result_note": "この URL を共有してください。1 回だけ開けます。",
+		"copy": "コピー",
+		"copied": "コピーしました！",
+		"reset": "もう 1 つ作成"
+	},
+	"reveal": {
+		"checking": "確認中…",
+		"no_key_title": "URL に鍵がありません",
+		"no_key_body": "この URL には復号用の鍵 (# 以降の部分) が含まれていません。鍵がないとシークレットは復号できません。",
+		"gone_title": "このシークレットはもう存在しません",
+		"gone_body": "すでに開かれたか、有効期限が切れています。",
+		"ready_title": "シークレットが届いています",
+		"ready_body": "開いた瞬間にサーバーから完全に削除されます。この URL は 2 度目は開けません。",
+		"reveal_button": "開く (1 回だけ)",
+		"revealing": "復号中…",
+		"destroyed_note": "シークレットはサーバーから削除されました。",
+		"error_title": "復号に失敗しました"
+	},
+	"errors": {
+		"create_failed": "作成に失敗しました: {status}",
+		"read_failed": "読み取りに失敗しました: {status}"
+	}
+}

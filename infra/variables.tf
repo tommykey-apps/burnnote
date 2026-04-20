@@ -16,10 +16,10 @@ variable "domain" {
   default     = "burnnote.tommykeyapp.com"
 }
 
-variable "bref_fpm_layer_arn" {
-  description = "Bref arm-php-84-fpm Lambda layer ARN (ap-northeast-1)"
+variable "bref_layer_arn" {
+  description = "Bref v3 arm-php-84 unified Lambda layer ARN (ap-northeast-1). Runtime mode (fpm/function/console) is controlled via BREF_RUNTIME env var."
   type        = string
-  default     = "arn:aws:lambda:ap-northeast-1:534081306603:layer:arm-php-84-fpm:39"
+  default     = "arn:aws:lambda:ap-northeast-1:873528684822:layer:arm-php-84:17"
 }
 
 variable "log_retention_days" {

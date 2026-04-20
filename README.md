@@ -42,14 +42,9 @@
 | **CloudWatch Logs** | Lambda ログ (7 日保持) |
 | **IAM** | Lambda 実行ロール (DynamoDB CRUD 最小権限) |
 
-## API エンドポイント
+## API
 
-| Method | Path | 機能 | ステータス |
-|---|---|---|---|
-| `POST` | `/api/notes` | 暗号文と IV を保存し ID を返す | `201` / `422` (validation) / `429` (rate limit) |
-| `GET` | `/api/notes/{id}/exists` | 存在確認のみ (削除しない、プレビュー用) | `200` / `404` |
-| `GET` | `/api/notes/{id}` | 暗号文と IV を返して即削除 (1-shot) | `200` / `410` Gone |
-| `GET` | `/health` | ヘルスチェック | `200` |
+エンドポイント一覧・リクエスト/レスポンススキーマは **[Swagger UI](https://tommykey-apps.github.io/burnnote/)** を参照。
 
 レート制限: `throttle:10,1` (クライアント IP で毎分 10 リクエスト)。
 

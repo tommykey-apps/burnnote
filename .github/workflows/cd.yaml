@@ -1,0 +1,154 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "api/**"
+      - "web/**"
+      - "infra/**"
+      - ".github/workflows/cd.yaml"
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ap-northeast-1
+  LAMBDA_FUNCTION: burnnote-api
+
+permissions:
+  contents: read
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      infra: ${{ steps.filter.outputs.infra }}
+      api: ${{ steps.filter.outputs.api }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            infra:
+              - 'infra/**'
+            api:
+              - 'api/**'
+            web:
+              - 'web/**'
+
+  deploy-infra:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.infra == 'true' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Apply
+        run: |
+          cd infra
+          terraform init
+          terraform apply -input=false -auto-approve
+
+  deploy-api:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.api == 'true' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, curl, bcmath, intl
+          coverage: none
+          tools: composer:v2
+
+      - name: Build Lambda bundle
+        run: |
+          cd api
+          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --classmap-authoritative
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
+          # Trim dev/test/doc files from AWS SDK
+          find vendor/aws/aws-sdk-php -type d \( -name 'tests' -o -name 'docs' -o -name 'examples' \) -prune -exec rm -rf {} + || true
+          zip -qr ../lambda.zip . -x '*.git*' 'tests/*' '.env' '.env.*' 'phpunit.xml' '.phpunit.cache/*' 'storage/logs/*'
+
+      - name: Deploy Lambda code
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ env.LAMBDA_FUNCTION }} \
+            --zip-file fileb://lambda.zip \
+            --no-cli-pager
+
+      - name: Set Lambda APP_KEY (only if placeholder)
+        run: |
+          CURRENT=$(aws lambda get-function-configuration \
+            --function-name ${{ env.LAMBDA_FUNCTION }} \
+            --query 'Environment.Variables.APP_KEY' --output text)
+          if [[ "$CURRENT" == *placeholder* ]]; then
+            NEW_KEY="base64:$(openssl rand -base64 32)"
+            aws lambda update-function-configuration \
+              --function-name ${{ env.LAMBDA_FUNCTION }} \
+              --environment "Variables={APP_KEY=$NEW_KEY}" \
+              --no-cli-pager
+          fi
+
+  deploy-web:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.web == 'true' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Build
+        run: |
+          cd web
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Get SSM parameters
+        id: params
+        run: |
+          echo "cloudfront_id=$(aws ssm get-parameter --name /burnnote/cloudfront-distribution-id --query 'Parameter.Value' --output text)" >> $GITHUB_OUTPUT
+          echo "frontend_bucket=$(aws ssm get-parameter --name /burnnote/frontend-bucket --query 'Parameter.Value' --output text)" >> $GITHUB_OUTPUT
+
+      - name: Sync to S3
+        run: aws s3 sync web/build/ s3://${{ steps.params.outputs.frontend_bucket }} --delete
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ steps.params.outputs.cloudfront_id }} \
+            --paths "/*"

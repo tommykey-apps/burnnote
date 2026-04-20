@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-21T00:00:00.000Z" agent="draw.io" version="24.0.0" type="device">
+  <diagram id="architecture" name="System Architecture">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="800" math="0" shadow="0" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="burnnote - System Architecture (Serverless + Zero-knowledge)" style="text;html=1;fontSize=20;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="700" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- User -->
+        <mxCell id="user" value="User" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.users;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="300" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Browser encryption callout -->
+        <mxCell id="browser_enc" value="Browser (WebCrypto API)&#xa;AES-256-GCM&#10;key stays in URL fragment #" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=11;fontStyle=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="30" y="400" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Route 53 -->
+        <mxCell id="r53" value="Route 53&#xa;(DNS)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.route_53;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=11;fillColor=#8C4FFF;fontColor=#000000;strokeColor=#8C4FFF;" vertex="1" parent="1">
+          <mxGeometry x="60" y="160" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- CloudFront -->
+        <mxCell id="cf" value="Amazon CloudFront&#xa;burnnote.tommykeyapp.com" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudfront;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=11;fillColor=#ED7100;fontColor=#000000;strokeColor=#ED7100;" vertex="1" parent="1">
+          <mxGeometry x="280" y="300" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ACM -->
+        <mxCell id="acm" value="ACM&#xa;*.tommykeyapp.com&#xa;(us-east-1)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.certificate_manager_3;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=10;fillColor=#DD344C;fontColor=#000000;strokeColor=#DD344C;" vertex="1" parent="1">
+          <mxGeometry x="280" y="160" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- S3 (Frontend) -->
+        <mxCell id="s3" value="Amazon S3&#xa;(SvelteKit Static)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=11;fillColor=#3F8624;fontColor=#000000;strokeColor=#3F8624;" vertex="1" parent="1">
+          <mxGeometry x="520" y="160" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- OAC label -->
+        <mxCell id="oac_label" value="OAC" style="text;html=1;fontSize=10;fontStyle=2;align=center;verticalAlign=middle;fillColor=#FFF2CC;strokeColor=#D6B656;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="220" width="40" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- API Gateway -->
+        <mxCell id="apigw" value="API Gateway&#xa;(HTTP API)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.api_gateway;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=11;fillColor=#ED7100;fontColor=#000000;strokeColor=#ED7100;" vertex="1" parent="1">
+          <mxGeometry x="520" y="300" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda -->
+        <mxCell id="lambda" value="AWS Lambda&#xa;(PHP 8.4 + Laravel 13)&#xa;arm64, Bref v3 layer" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=10;fillColor=#ED7100;fontColor=#000000;strokeColor=#ED7100;" vertex="1" parent="1">
+          <mxGeometry x="740" y="300" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- DynamoDB -->
+        <mxCell id="dynamodb" value="Amazon DynamoDB&#xa;(notes table)&#xa;On-Demand + TTL" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.dynamodb;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=10;fillColor=#3F8624;fontColor=#000000;strokeColor=#3F8624;" vertex="1" parent="1">
+          <mxGeometry x="980" y="300" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- IAM label -->
+        <mxCell id="iam_label" value="IAM Role&#xa;(DynamoDB CRUD)" style="text;html=1;fontSize=10;fontStyle=2;align=center;verticalAlign=middle;fillColor=#E1D5E7;strokeColor=#9673A6;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="310" width="100" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- CloudWatch Logs -->
+        <mxCell id="cw_logs" value="CloudWatch Logs&#xa;(7-day retention)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.cloudwatch_2;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=10;fillColor=#E7157B;fontColor=#000000;strokeColor=#E7157B;" vertex="1" parent="1">
+          <mxGeometry x="740" y="460" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- SSM Parameter Store -->
+        <mxCell id="ssm" value="SSM Parameter&#xa;(CloudFront ID,&#xa;bucket name)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.systems_manager;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=10;fillColor=#4D72F3;fontColor=#000000;strokeColor=#4D72F3;" vertex="1" parent="1">
+          <mxGeometry x="980" y="460" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Zero-knowledge note -->
+        <mxCell id="zk_note" value="Zero-knowledge:&#10;Server stores only ciphertext + IV.&#10;Decryption key travels in URL fragment (#),&#10;which is never sent in HTTP requests,&#10;never in Referer, never in access logs." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=11;align=left;verticalAlign=top;spacing=10;" vertex="1" parent="1">
+          <mxGeometry x="860" y="160" width="340" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- GitHub Actions CI/CD -->
+        <mxCell id="gha" value="GitHub Actions&#xa;CI/CD" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.general_toolkit;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=10;fillColor=#24292E;fontColor=#000000;strokeColor=#24292E;" vertex="1" parent="1">
+          <mxGeometry x="280" y="460" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Terraform -->
+        <mxCell id="tf" value="Terraform&#xa;(S3 backend)" style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.general_toolkit;labelBackgroundColor=none;sketch=0;fontStyle=1;fontSize=10;fillColor=#7B42BC;fontColor=#000000;strokeColor=#7B42BC;" vertex="1" parent="1">
+          <mxGeometry x="400" y="460" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows -->
+        <!-- User → Route 53 (DNS lookup) -->
+        <mxCell id="e_user_r53" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#8C4FFF;dashed=1;" edge="1" source="user" target="r53" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_user_r53_label" value="DNS" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="e_user_r53">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- Route 53 → CloudFront -->
+        <mxCell id="e_r53_cf" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#8C4FFF;dashed=1;" edge="1" source="r53" target="cf" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ACM → CloudFront -->
+        <mxCell id="e_acm_cf" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#DD344C;dashed=1;" edge="1" source="acm" target="cf" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_acm_cf_label" value="SSL" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="e_acm_cf">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- User → CloudFront -->
+        <mxCell id="e_user_cf" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#ED7100;" edge="1" source="user" target="cf" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_user_cf_label" value="HTTPS" style="edgeLabel;html=1;fontSize=9;fontStyle=1;" vertex="1" connectable="0" parent="e_user_cf">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- CloudFront → S3 -->
+        <mxCell id="e_cf_s3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#3F8624;" edge="1" source="cf" target="s3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_cf_s3_label" value="/ (SPA)" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="e_cf_s3">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- CloudFront → API Gateway -->
+        <mxCell id="e_cf_apigw" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#ED7100;" edge="1" source="cf" target="apigw" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_cf_apigw_label" value="/api/*" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="e_cf_apigw">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- API Gateway → Lambda -->
+        <mxCell id="e_apigw_lambda" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#ED7100;" edge="1" source="apigw" target="lambda" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_apigw_lambda_label" value="$default" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="e_apigw_lambda">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- Lambda → DynamoDB -->
+        <mxCell id="e_lambda_ddb" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#3F8624;" edge="1" source="lambda" target="dynamodb" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_lambda_ddb_label" value="Put / ConditionalDelete" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="e_lambda_ddb">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <!-- Lambda → CloudWatch Logs -->
+        <mxCell id="e_lambda_cw" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#E7157B;dashed=1;" edge="1" source="lambda" target="cw_logs" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- GitHub Actions → S3 + Lambda + Terraform -->
+        <mxCell id="e_gha_s3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#24292E;dashed=1;" edge="1" source="gha" target="s3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_gha_s3_label" value="deploy-web" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="e_gha_s3">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_gha_lambda" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#24292E;dashed=1;" edge="1" source="gha" target="lambda" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_gha_lambda_label" value="deploy-api" style="edgeLabel;html=1;fontSize=9;" vertex="1" connectable="0" parent="e_gha_lambda">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+
+        <mxCell id="e_gha_tf" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#7B42BC;dashed=1;" edge="1" source="gha" target="tf" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Browser encryption → User (visual cue) -->
+        <mxCell id="e_browser_user" style="edgeStyle=none;html=1;strokeWidth=1;strokeColor=#D6B656;dashed=1;endArrow=none;" edge="1" source="browser_enc" target="user" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

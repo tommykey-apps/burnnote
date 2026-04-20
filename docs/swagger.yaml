@@ -93,7 +93,7 @@ paths:
   /health:
     get:
       summary: Health check
-      description: Laravel health ルート (`Application::withRouting(health: '/health')`)
+      description: "Laravel health ルート (`Application::withRouting(health: '/health')`)"
       responses:
         '200':
           description: OK

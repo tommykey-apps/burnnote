@@ -1,0 +1,48 @@
+{
+	"meta": {
+		"title": "burnnote — one-time secrets",
+		"description": "Share secrets that self-destruct after one read."
+	},
+	"nav": {
+		"tagline": "one-time secrets"
+	},
+	"footer": {
+		"note": "Encrypted in your browser. The server never sees the key."
+	},
+	"create": {
+		"heading": "Share a one-time secret",
+		"description": "The secret is encrypted in your browser. The server stores only the ciphertext. The URL is destroyed after a single read.",
+		"label_secret": "Secret",
+		"placeholder": "Type or paste a secret…",
+		"label_expires": "Expires in",
+		"expiry": {
+			"5m": "5 minutes",
+			"1h": "1 hour",
+			"1d": "1 day",
+			"7d": "7 days"
+		},
+		"submit": "Create one-time URL",
+		"submitting": "Encrypting…",
+		"result_note": "Share this URL. It works only once.",
+		"copy": "Copy",
+		"copied": "Copied!",
+		"reset": "Create another"
+	},
+	"reveal": {
+		"checking": "Checking…",
+		"no_key_title": "No key in URL",
+		"no_key_body": "This URL is missing the decryption key (the part after #). Without it the secret cannot be decrypted.",
+		"gone_title": "This secret is gone",
+		"gone_body": "It has been read once, or it has expired.",
+		"ready_title": "A secret is waiting for you",
+		"ready_body": "Once revealed, it will be permanently deleted from the server. You will not be able to re-open this link.",
+		"reveal_button": "Reveal once",
+		"revealing": "Decrypting…",
+		"destroyed_note": "This secret has been destroyed on the server.",
+		"error_title": "Failed to decrypt"
+	},
+	"errors": {
+		"create_failed": "create failed: {status}",
+		"read_failed": "read failed: {status}"
+	}
+}

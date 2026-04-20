@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { consumeNote, existsNote } from '$lib/api';
 	import { decrypt } from '$lib/crypto';
+	import { t } from '$lib/i18n/index.svelte';
 
 	type View =
 		| { kind: 'checking' }
@@ -51,48 +52,40 @@
 
 <div class="space-y-6">
 	{#if view.kind === 'checking'}
-		<p class="text-muted-foreground">Checking…</p>
+		<p class="text-muted-foreground">{t('reveal.checking')}</p>
 	{:else if view.kind === 'no-key'}
 		<div class="rounded-lg border border-destructive/50 bg-destructive/10 p-6">
-			<h1 class="text-xl font-bold">No key in URL</h1>
-			<p class="mt-2 text-sm text-muted-foreground">
-				This URL is missing the decryption key (the part after <code>#</code>). Without it
-				the secret cannot be decrypted.
-			</p>
+			<h1 class="text-xl font-bold">{t('reveal.no_key_title')}</h1>
+			<p class="mt-2 text-sm text-muted-foreground">{t('reveal.no_key_body')}</p>
 		</div>
 	{:else if view.kind === 'gone'}
 		<div class="rounded-lg border border-[color:var(--color-border)] bg-card p-6">
-			<h1 class="text-xl font-bold">This secret is gone</h1>
-			<p class="mt-2 text-sm text-muted-foreground">
-				It has been read once, or it has expired.
-			</p>
+			<h1 class="text-xl font-bold">{t('reveal.gone_title')}</h1>
+			<p class="mt-2 text-sm text-muted-foreground">{t('reveal.gone_body')}</p>
 		</div>
 	{:else if view.kind === 'ready'}
 		<div class="rounded-lg border border-[color:var(--color-border)] bg-card p-6 space-y-4">
-			<h1 class="text-xl font-bold">A secret is waiting for you</h1>
-			<p class="text-sm text-muted-foreground">
-				Once revealed, it will be permanently deleted from the server. You will not be able
-				to re-open this link.
-			</p>
+			<h1 class="text-xl font-bold">{t('reveal.ready_title')}</h1>
+			<p class="text-sm text-muted-foreground">{t('reveal.ready_body')}</p>
 			<button
 				type="button"
 				onclick={reveal}
 				class="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
 			>
-				Reveal once
+				{t('reveal.reveal_button')}
 			</button>
 		</div>
 	{:else if view.kind === 'revealing'}
-		<p class="text-muted-foreground">Decrypting…</p>
+		<p class="text-muted-foreground">{t('reveal.revealing')}</p>
 	{:else if view.kind === 'revealed'}
 		<div class="rounded-lg border border-[color:var(--color-border)] bg-card p-6 space-y-3">
-			<p class="text-sm text-muted-foreground">This secret has been destroyed on the server.</p>
+			<p class="text-sm text-muted-foreground">{t('reveal.destroyed_note')}</p>
 			<pre
 				class="whitespace-pre-wrap break-words rounded-md bg-muted p-4 font-mono text-sm">{view.text}</pre>
 		</div>
 	{:else if view.kind === 'error'}
 		<div class="rounded-lg border border-destructive/50 bg-destructive/10 p-6">
-			<h1 class="text-xl font-bold">Failed to decrypt</h1>
+			<h1 class="text-xl font-bold">{t('reveal.error_title')}</h1>
 			<p class="mt-2 text-sm text-muted-foreground">{view.message}</p>
 		</div>
 	{/if}

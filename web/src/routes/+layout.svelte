@@ -10,7 +10,7 @@
 </svelte:head>
 
 <div class="min-h-screen bg-background text-foreground">
-	<header class="border-b border-[color:var(--color-border)]">
+	<header class="sticky top-0 z-40 border-b border-[color:var(--color-border)] bg-background/80 backdrop-blur">
 		<div class="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
 			<a href="/" class="text-xl font-bold tracking-tight">burnnote</a>
 			<span class="text-sm text-muted-foreground">one-time secrets</span>

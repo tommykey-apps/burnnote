@@ -1,11 +1,3 @@
-## Flox Environment Manifest -----------------------------------------
-##
-##   _Everything_ you need to know about the _manifest_ is here:
-##
-##   https://flox.dev/docs/reference/command-reference/manifest.toml/
-##
-## -------------------------------------------------------------------
-# Flox manifest version managed by Flox CLI
 schema-version = "1.11.0"
 
 
@@ -22,6 +14,9 @@ pnpm.pkg-path = "pnpm"
 terraform.pkg-path = "terraform"
 awscli2.pkg-path = "awscli2"
 jq.pkg-path = "jq"
+xvfb.pkg-path = "xorg.xvfb"
+xvfb-run.pkg-path = "xvfb-run"
+xvfb-run.systems = ["x86_64-linux", "aarch64-linux"]
 
 
 ## Environment Variables ---------------------------------------------

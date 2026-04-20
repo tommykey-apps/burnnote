@@ -1,0 +1,181 @@
+openapi: 3.0.3
+info:
+  title: burnnote API
+  version: 1.0.0
+  description: |
+    1 回読んだら消える秘密共有サービスの公開 API。
+
+    **ゼロ知識設計**: クライアント (ブラウザ) が AES-256-GCM で暗号化した
+    `ciphertext` と `iv` のみがサーバーに送信され、復号鍵は URL fragment
+    (`#` 以降) に載るため HTTP リクエストには含まれない。サーバー側は
+    平文を知らない。
+
+    **1-shot 削除**: `GET /api/notes/{id}` は暗号文を返しつつ DynamoDB の
+    条件付き DeleteItem で同一リクエスト内に削除。2 回目は 410 Gone。
+  contact:
+    name: burnnote
+    url: https://burnnote.tommykeyapp.com
+servers:
+  - url: https://burnnote.tommykeyapp.com
+    description: Production
+paths:
+  /api/notes:
+    post:
+      summary: Create a one-time secret
+      description: |
+        暗号化済みペイロードを保存し、取り出し用 ID を返す。
+        ブラウザ側で WebCrypto API により AES-256-GCM 暗号化を行ってから
+        base64url エンコードしたものを送ること。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateResponse'
+        '422':
+          description: バリデーションエラー (不正な base64、サイズ超過、expires_in 範囲外 等)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '429':
+          description: レート制限 (`throttle:10,1` に到達)
+  /api/notes/{id}/exists:
+    get:
+      summary: Check existence (non-destructive)
+      description: |
+        指定 ID のノートが存在し未読であるかを返す。**削除はしない**。
+        復号前のプレビュー画面で "Reveal once" ボタンを出してよいか判断するため。
+      parameters:
+        - $ref: '#/components/parameters/NoteId'
+      responses:
+        '200':
+          description: 存在する (未読かつ未期限切れ)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExistsResponse'
+        '404':
+          description: 存在しない、または期限切れ (TTL 以内だが `expires_at` 経過分も含む)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/notes/{id}:
+    get:
+      summary: Consume (read and destroy)
+      description: |
+        暗号文と IV を返し、**同一リクエスト内で DynamoDB から削除**する。
+        クライアントはレスポンスを受け取ったら URL fragment の鍵で復号する。
+        2 度目以降のアクセスは 410 Gone。
+      parameters:
+        - $ref: '#/components/parameters/NoteId'
+      responses:
+        '200':
+          description: ciphertext と iv を返却、サーバー側では削除済み
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsumeResponse'
+        '410':
+          description: すでに読まれた、または期限切れ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /health:
+    get:
+      summary: Health check
+      description: Laravel health ルート (`Application::withRouting(health: '/health')`)
+      responses:
+        '200':
+          description: OK
+components:
+  parameters:
+    NoteId:
+      in: path
+      name: id
+      required: true
+      description: ノート ID (16〜64 文字の base64url セーフ文字列)
+      schema:
+        type: string
+        pattern: '^[0-9a-zA-Z_-]{16,64}$'
+        example: 'QxgPuWb6smgqBUWGMHHSmg'
+  schemas:
+    CreateRequest:
+      type: object
+      required: [ciphertext, iv, expires_in]
+      properties:
+        ciphertext:
+          type: string
+          description: AES-256-GCM で暗号化された平文の base64url 表現 (最大 16 KB)
+          pattern: '^[A-Za-z0-9_-]+={0,2}$'
+          example: 'U29tZVNlY3JldCBDaXBoZXJ0ZXh0...'
+        iv:
+          type: string
+          description: 12 バイト IV の base64url 表現
+          pattern: '^[A-Za-z0-9_-]+={0,2}$'
+          example: 'MTIzNDU2Nzg5MGFi'
+        expires_in:
+          type: integer
+          description: 有効期限までの秒数 (60 秒以上 7 日以下)
+          minimum: 60
+          maximum: 604800
+          example: 3600
+    CreateResponse:
+      type: object
+      required: [id, expires_at]
+      properties:
+        id:
+          type: string
+          description: 取り出しに使う ID
+          example: 'QxgPuWb6smgqBUWGMHHSmg'
+        expires_at:
+          type: integer
+          description: 有効期限の Unix epoch 秒
+          example: 1776691173
+    ExistsResponse:
+      type: object
+      required: [exists, expires_at]
+      properties:
+        exists:
+          type: boolean
+          example: true
+        expires_at:
+          type: integer
+          example: 1776691173
+    ConsumeResponse:
+      type: object
+      required: [ciphertext, iv]
+      properties:
+        ciphertext:
+          type: string
+          example: 'U29tZVNlY3JldCBDaXBoZXJ0ZXh0...'
+        iv:
+          type: string
+          example: 'MTIzNDU2Nzg5MGFi'
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          example: 'gone'
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string

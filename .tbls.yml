@@ -1,0 +1,37 @@
+# tbls configuration for DynamoDB schema documentation.
+#
+# IMPORTANT: tbls の DynamoDB driver は DSN クエリの endpoint パラメータを認識しない。
+# DynamoDB Local に接続するには AWS_ENDPOINT_URL=http://localhost:8000 を環境変数で
+# 併用すること。Makefile の `db-docs` ターゲット経由で実行するのが正規の手順。
+#
+# `tbls doc` を素手で打つと AWS 本番に誤接続する可能性があるため、必ず `make db-docs`
+# を使うこと。詳細は docs-db/README.md。
+
+dsn: dynamo://ap-northeast-1?aws_access_key_id=local&aws_secret_access_key=local
+
+docPath: docs-db/schema
+
+format:
+  adjust: true
+  sort: false
+
+include:
+  - burnnote
+
+# tbls の DynamoDB driver は DescribeTable の AttributeDefinitions しかカラム化しない。
+# このテーブルは id 1 属性しか宣言されていないため、自動生成されるカラム表は 1 行だけ。
+# 実アイテムの属性 (ciphertext, iv, created_at, expires_at) は出力されない。
+# また TTL 属性 (expires_at) も AttributeDefinitions に含まれないため tbls 出力に出ない。
+# よって意味のある補足は以下の comments と、docs-db/entities.md / access-patterns.md
+# (手書き) に書く。
+comments:
+  - table: burnnote
+    tableComment: |
+      One-time Secret single table. Stores AES-256-GCM ciphertext + IV.
+      TTL on `expires_at` (Number, Unix timestamp) deletes items asynchronously.
+      `consume()` performs an atomic deleteItem with ConditionExpression to ensure
+      one-time read semantics. See ../entities.md and ../access-patterns.md.
+    columnComments:
+      id: |
+        Partition key. URL-safe base64 of 16 random bytes (`\Random\Randomizer`).
+        Used as the public note ID in the URL fragment.

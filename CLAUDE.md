@@ -74,6 +74,11 @@ cd infra && terraform destroy           # 使わないときは destroy
 4. 発行 URL: `https://burnnote.tommykeyapp.com/s/{id}#{key_b64}` — fragment はサーバー送信されない
 5. 受信者アクセス → サーバー暗号文を返却&即削除 → ブラウザが fragment の鍵で復号
 
+## DB スキーマドキュメント
+
+`docs-db/` に DynamoDB スキーマドキュメント。`make db-docs` で再生成。
+詳細: [docs-db/entities.md](docs-db/entities.md), [docs-db/access-patterns.md](docs-db/access-patterns.md)
+
 ## 設計判断
 
 - **arm64 + Bref layer** (`arm-php-84-fpm`) — 最安、最新 Laravel 13 対応
